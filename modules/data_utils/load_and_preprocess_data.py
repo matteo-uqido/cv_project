@@ -29,25 +29,26 @@ def get_train_test_val_partition(path):
     train_df, valid_df = train_test_split(train_val_df, test_size=0.2, random_state=42)
     return train_df, valid_df, test_df
 
-def get_new_generators(*, batch_size=32, target_size=(224, 224), model_type=None):
+def get_new_generators(*, batch_size=32, target_size=(224, 224), model_name=None):
     """
     Create data generators for training, validation, and testing.
     
     Args:
         batch_size (int): Size of the batches of data.
         target_size (tuple): Target size for resizing images.
-        model_type (str): Type of model to use for preprocessing (required).
+        model_name (str): Type of model to use for preprocessing (required).
         
     Returns:
         tuple: Training, validation, and test data generators.
     """
-    if model_type is None:
-        raise ValueError("Parameter 'model_type' must be specified (e.g., 'vgg16', 'resnet', etc.).")
+    if model_name is None:
+        raise ValueError("Parameter 'model_name' must be specified (e.g., 'vgg16', 'resnet', etc.).")
 
     train_df, valid_df, test_df = get_train_test_val_partition(DATA_PATH)
     
-    train_generator = DataGenerator_count(train_df, batch_size=batch_size, target_size=target_size, model_type=model_type)
-    valid_generator = DataGenerator_count(valid_df, batch_size=batch_size, target_size=target_size, model_type=model_type,shuffle=False)
-    test_generator = DataGenerator_count(test_df, batch_size=batch_size, target_size=target_size, model_type=model_type,shuffle=False)
+    train_generator = DataGenerator_count(train_df, batch_size=batch_size, target_size=target_size, model_name=model_name,augment=True)
+    valid_generator = DataGenerator_count(valid_df, batch_size=batch_size, target_size=target_size, model_name=model_name,shuffle=False)
+    test_generator = DataGenerator_count(test_df, batch_size=batch_size, target_size=target_size, model_name=model_name,shuffle=False)
     
     return train_generator, valid_generator, test_generator
+

@@ -1,7 +1,7 @@
 mall_dataset/
 venv/
 __pycache__/
-trash_folder
+trash_folder/
 *.pyc
 .ipynb_checkpoints/
 project_notebook.ipynb

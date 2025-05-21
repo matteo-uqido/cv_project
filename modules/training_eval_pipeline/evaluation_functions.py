@@ -2,7 +2,7 @@ import numpy as np
 from scipy.ndimage import gaussian_filter
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 from scipy.stats import pearsonr
-import matplotlib.pyplot as plt
+
 def evaluate_model(model, test_generator):
     predicted_counts = []
     true_counts = []
@@ -49,19 +49,4 @@ def full_eval(x, model, smooth=False):
 
     return counts_batch
 
-def plot_training_history(history):
-    loss = history.history['loss']
-    val_loss = history.history['val_loss']
-    epochs = range(1, len(loss) + 1)
-
-    plt.figure(figsize=(10, 6))
-    plt.plot(epochs, loss, 'b-', label='Training Loss')
-    plt.plot(epochs, val_loss, 'r-', label='Validation Loss')
-    plt.title('Training and Validation Loss')
-    plt.xlabel('Epochs')
-    plt.ylabel('Loss')
-    plt.legend()
-    plt.grid(True)
-    plt.yscale('log')
-    plt.show()
 
