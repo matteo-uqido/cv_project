@@ -1,0 +1,6 @@
+mall_dataset/
+venv/
+__pycache__/
+trash_folder
+*.pyc
+.ipynb_checkpoints/

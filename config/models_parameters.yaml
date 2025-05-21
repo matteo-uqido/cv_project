@@ -1,0 +1,35 @@
+resnet50:
+  parameters:
+    adam_lr: 0.001
+    epochs: 50
+    loss: euclidean            # or 'euclidean'
+    metrics: ['mse']     # or ['mse']
+    es_patience: 5
+    monitor: val_mse     # ← if loss == 'mse' → 'val_mae'; if loss == 'euclidean' → 'val_mse'
+
+vgg16:
+  parameters:
+    adam_lr: 0.0001
+    epochs: 2
+    loss: mse
+    metrics: ['mae']
+    es_patience: 5
+    monitor: val_mae     # ← adjust based on loss function
+
+vgg19:
+  parameters:
+    adam_lr: 0.0001
+    epochs: 50
+    loss: euclidean
+    metrics: ['mse']
+    es_patience: 5
+    monitor: val_mse     # ← adjust based on loss function
+
+xception:
+  parameters:
+    adam_lr: 0.001
+    epochs: 50
+    loss: mse
+    metrics: ['mae']
+    es_patience: 3
+    monitor: val_mae     # ← if using 'euclidean', change to 'val_mse'
