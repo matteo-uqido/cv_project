@@ -4,3 +4,4 @@ __pycache__/
 trash_folder
 *.pyc
 .ipynb_checkpoints/
+project_notebook.ipynb
