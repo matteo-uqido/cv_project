@@ -29,7 +29,7 @@ def get_train_test_val_partition(path):
     train_df, valid_df = train_test_split(train_val_df, test_size=0.2, random_state=42)
     return train_df, valid_df, test_df
 
-def get_new_generators(*, batch_size=32, target_size=(224, 224), model_name=None):
+def get_new_generators(*, batch_size=32, target_size=(224, 224), model_name=None,augment_data=False):
     """
     Create data generators for training, validation, and testing.
     
@@ -46,7 +46,7 @@ def get_new_generators(*, batch_size=32, target_size=(224, 224), model_name=None
 
     train_df, valid_df, test_df = get_train_test_val_partition(DATA_PATH)
     
-    train_generator = DataGenerator_count(train_df, batch_size=batch_size, target_size=target_size, model_name=model_name,augment=True)
+    train_generator = DataGenerator_count(train_df, batch_size=batch_size, target_size=target_size, model_name=model_name,augment=True if augment_data else False)
     valid_generator = DataGenerator_count(valid_df, batch_size=batch_size, target_size=target_size, model_name=model_name,shuffle=False)
     test_generator = DataGenerator_count(test_df, batch_size=batch_size, target_size=target_size, model_name=model_name,shuffle=False)
     
