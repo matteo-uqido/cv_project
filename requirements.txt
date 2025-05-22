@@ -6,4 +6,4 @@ tensorflow
 opencv-python
 matplotlib
 pyyaml
-
+tqdm
