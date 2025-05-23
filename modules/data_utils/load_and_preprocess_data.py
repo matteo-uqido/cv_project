@@ -1,6 +1,6 @@
 
 import os
-from modules.data_utils.data_processor_class import DataGenerator_count
+from modules.data_utils.data_processor_class import DataGenerator_count, DataGenerator_density
 import pandas as pd
 from scipy.io import loadmat
 from sklearn.model_selection import train_test_split
@@ -28,16 +28,23 @@ def get_train_test_val_partition(path):
     train_df, valid_df = train_test_split(train_val_df, test_size=0.2, random_state=42)
     return train_df, valid_df, test_df
 
-def get_new_generators(*, batch_size=32, target_size=(224, 224), model_name=None,augment_data=False):
+def get_new_generators(batch_size=32, model_name=None,augment_data=False):
     
     if model_name is None:
         raise ValueError("Parameter 'model_name' must be specified (e.g., 'vgg16', 'resnet', etc.).")
+    
 
     train_df, valid_df, test_df = get_train_test_val_partition(DATA_PATH)
-    
-    train_generator = DataGenerator_count(train_df, batch_size=batch_size, target_size=target_size, model_name=model_name,augment=True if augment_data else False)
-    valid_generator = DataGenerator_count(valid_df, batch_size=batch_size, target_size=target_size, model_name=model_name,shuffle=False)
-    test_generator = DataGenerator_count(test_df, batch_size=batch_size, target_size=target_size, model_name=model_name,shuffle=False)
+
+    if model_name=="csrnet":
+        train_generator=DataGenerator_density(train_df, batch_size, shuffle=True, target_size=(240, 320))
+        valid_generator=DataGenerator_density(valid_df, batch_size, shuffle=False, target_size=(240, 320))
+        test_generator=DataGenerator_density(test_df, batch_size, shuffle=False, target_size=(240, 320))
+    else:
+        target_size = (224, 224)
+        train_generator = DataGenerator_count(train_df, batch_size=batch_size, target_size=target_size, model_name=model_name,augment=True if augment_data else False)
+        valid_generator = DataGenerator_count(valid_df, batch_size=batch_size, target_size=target_size, model_name=model_name,shuffle=False)
+        test_generator = DataGenerator_count(test_df, batch_size=batch_size, target_size=target_size, model_name=model_name,shuffle=False)
     
     return train_generator, valid_generator, test_generator
 

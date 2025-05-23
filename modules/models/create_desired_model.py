@@ -1,7 +1,10 @@
 try:
+    from tensorflow.keras import layers, models
     from tensorflow.keras.models import Model
     from tensorflow.keras.layers import Dense
+    from tensorflow.keras.applications import VGG16
     from tensorflow.keras.applications import vgg16, vgg19, resnet50, xception
+    from tensorflow.keras.initializers import RandomNormal
     print("TensorFlow imports succeeded.")
 except ImportError as e:
     print("TensorFlow import failed:", e)
@@ -28,6 +31,8 @@ def create_chosen_model(model_type: str):
         return create_vgg19_model()
     elif model_type == 'xception':
         return create_xception_model()
+    elif model_type == 'csrnet':
+        return create_CSRNet_model()
     else:
         raise ValueError(f"Unsupported model_type: {model_type}. Choose from 'resnet50', 'vgg16', 'vgg19', 'xception'.")
 
@@ -121,3 +126,39 @@ def create_xception_model():
     model = Model(inputs=base_model.input, outputs=predictions)
 
     return model
+
+def create_CSRNet_model(input_shape=(240, 320, 4)):
+    input_tensor = layers.Input(shape=input_shape)
+    x = preprocessing_module(input_tensor)
+
+
+
+def create_CSRNet_model(input_shape=(240, 320, 4)):
+    input_tensor = layers.Input(shape=input_shape)
+    x = preprocessing_module(input_tensor)  # Output shape (240,320,3)
+    
+    vgg = VGG16(include_top=False, weights='imagenet', input_shape=(240,320,3))
+    x = vgg(x)  # Use VGG16 as a layer on preprocessed output
+
+    # Continue with CSRNet backend
+    init = RandomNormal(stddev=0.01, seed=123)
+    x = layers.Conv2D(512, (3, 3), activation='relu', dilation_rate=2, kernel_initializer=init, padding='same')(x)
+    x = layers.Conv2D(512, (3, 3), activation='relu', dilation_rate=2, kernel_initializer=init, padding='same')(x)
+    x = layers.Conv2D(512, (3, 3), activation='relu', dilation_rate=2, kernel_initializer=init, padding='same')(x)
+    x = layers.Conv2D(256, (3, 3), activation='relu', dilation_rate=2, kernel_initializer=init, padding='same')(x)
+    x = layers.Conv2D(128, (3, 3), activation='relu', dilation_rate=2, kernel_initializer=init, padding='same')(x)
+    x = layers.Conv2D(64, (3, 3), activation='relu', dilation_rate=2, kernel_initializer=init, padding='same')(x)
+    output = layers.Conv2D(1, (1, 1), dilation_rate=1, kernel_initializer=init, padding='same')(x)
+
+    model = models.Model(inputs=input_tensor, outputs=output)
+    return model
+
+
+def preprocessing_module(input_tensor):
+    x = layers.Conv2D(64, (3, 3), padding='same', activation='relu')(input_tensor)
+    x = layers.BatchNormalization()(x)
+    x = layers.Conv2D(64, (3, 3), padding='same', activation='relu')(x)
+    x = layers.BatchNormalization()(x)
+    x = layers.Conv2D(3, (1, 1), padding='same', activation='linear')(x)  # Output 3 channels
+    return x
+

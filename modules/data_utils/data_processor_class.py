@@ -10,6 +10,8 @@ from tensorflow.keras.applications.resnet50 import preprocess_input as resnet_pr
 from tensorflow.keras.applications.xception import preprocess_input as xception_preprocess
 import tensorflow as tf
 
+from modules.data_utils.density_map_utils import create_density_map
+
 class DataGenerator_count(Sequence):
     def __init__(self, dataframe, batch_size=32, shuffle=True, target_size=(224, 224),
                  model_name="vgg16", augment=False, seed=42):
@@ -165,7 +167,27 @@ class DataGenerator_density(Sequence):
         X, y = [], []
 
         for _, row in batch_df.iterrows():
+            image_annotations = row['annotations']
+            image_density_map = create_density_map(image_annotations)
+
+            # Resize density map to 1/8th of target size
+            density_map_target_size = (self.target_size[1] // 8, self.target_size[0] // 8)
+            resized_density_map = cv2.resize(
+                image_density_map,
+                density_map_target_size,
+                interpolation=cv2.INTER_AREA)
+
             image_path = os.path.join(self.frames_dir, row.image_name)
             image = cv2.imread(image_path)
             if image is not None:
                 image = self.resize_image(image)
+                image = self.preprocess_image(image)
+                #create an extra channel for the density map so that it matches the image shape
+                image_density_map_channel=image_density_map[:, :, np.newaxis]
+                image_with_density = np.concatenate((image, image_density_map_channel), axis=-1)
+
+                X.append(image_with_density)
+                y.append(resized_density_map)
+            else:
+                print(f"Warning: Could not load image at {image_path}")
+        return np.array(X), np.array(y, dtype=np.float32)  
