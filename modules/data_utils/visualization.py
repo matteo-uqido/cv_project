@@ -81,3 +81,28 @@ def plot_headcount_frequency_histogram():
     
     # Plot histogram
     plot_histogram_with_median(num_heads_list)
+
+def plot_density_comparisons(ground_truths,predictions, num_samples=3):
+
+    assert len(predictions) == len(ground_truths), "Predictions and ground truths must have the same length."
+    
+    total_samples = len(predictions)
+    indices = np.random.choice(total_samples, size=num_samples, replace=False)
+    
+    fig, axes = plt.subplots(num_samples, 2, figsize=(8, 4 * num_samples))
+    
+    for i, idx in enumerate(indices):
+        # Predicted
+        ax_pred = axes[i, 0] if num_samples > 1 else axes[0]
+        ax_pred.imshow(predictions[idx], cmap='viridis')
+        ax_pred.set_title(f"Predicted #{idx}")
+        ax_pred.axis('off')
+        
+        # Ground truth
+        ax_gt = axes[i, 1] if num_samples > 1 else axes[1]
+        ax_gt.imshow(ground_truths[idx], cmap='viridis')
+        ax_gt.set_title(f"Ground Truth #{idx}")
+        ax_gt.axis('off')
+    
+    plt.tight_layout()
+    plt.show()

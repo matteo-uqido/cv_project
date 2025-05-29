@@ -10,7 +10,7 @@ resnet50:
 vgg16:
   parameters:
     adam_lr: 0.0001
-    epochs: 2
+    epochs: 50
     loss: mse
     metrics: ['mae']
     es_patience: 5
@@ -19,7 +19,7 @@ vgg16:
 vgg19:
   parameters:
     adam_lr: 0.0001
-    epochs: 1
+    epochs: 50
     loss: euclidean
     metrics: ['mse']
     es_patience: 5
@@ -36,7 +36,7 @@ xception:
 csrnet:
   parameters:
     adam_lr: 0.0001
-    epochs: 50
+    epochs: 1
     loss: mse
     metrics: ['mae']
     es_patience: 10

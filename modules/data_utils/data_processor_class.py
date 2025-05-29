@@ -121,6 +121,13 @@ class DataGenerator_density(Sequence):
                 image_density_map,
                 density_map_target_size,
                 interpolation=cv2.INTER_AREA)
+            # Compute scaling factor to preserve total count
+            original_pixel_count = self.target_size[0] * self.target_size[1]
+            new_pixel_count = density_map_target_size[0] * density_map_target_size[1]
+            scaling_factor = original_pixel_count / new_pixel_count
+
+            # Apply scaling
+            resized_density_map *= scaling_factor
 
             image_path = os.path.join(self.frames_dir, row.image_name)
             image = cv2.imread(image_path)
