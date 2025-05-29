@@ -9,7 +9,7 @@ def evaluate_model(model, test_generator):
     for i in range(len(test_generator)):
         batch_images, batch_labels = test_generator[i]
         predicted_counts.extend(get_model_predictions(model, batch_images))
-        true_counts.extend([np.sum(label) for label in batch_labels])
+        true_counts.extend(np.round([np.sum(label) for label in batch_labels]))
     
     return np.array(true_counts), np.array(predicted_counts)
 
