@@ -12,15 +12,6 @@ except ImportError as e:
 
 #this file creates the models we are going to employ for crowd counting 
 def create_chosen_model(model_type: str):
-    """
-    Factory function to create a model based on model_type.
-    Args:
-        model_type (str): One of ['resnet50', 'vgg16', 'vgg19', 'xception']
-    Returns:
-        keras.Model: The selected model.
-    Raises:
-        ValueError: If an unsupported model_type is provided.
-    """
     model_type = model_type.lower()
     
     if model_type == 'resnet50':
@@ -104,13 +95,6 @@ def create_vgg19_model():
 
     return model
 def create_xception_model():
-    """
-    This function creates a Xception model with the following specifications:
-    - Pretrained on ImageNet
-    - Excludes the top fully-connected layer
-    - Input shape of (224, 224, 3)
-    - Global average pooling layer added after the last convolutional block
-    """
     base_model = xception.Xception(
         weights='imagenet',  
         include_top=False,  
@@ -127,20 +111,25 @@ def create_xception_model():
 
     return model
 
-def create_CSRNet_model(input_shape=(240, 320, 4)):
-    input_tensor = layers.Input(shape=input_shape)
-    x = preprocessing_module(input_tensor)
+def create_CSRNet_model():
+    data_processor_shape = (240, 320, 4)
+    input_tensor = layers.Input(shape=data_processor_shape)
+    x = preprocessing_module(input_tensor)  # Output: (240, 320, 3)
 
+    # Load full VGG16
+    full_vgg = VGG16(include_top=False, weights='imagenet', input_shape=(240, 320, 3))
 
+    # Truncate VGG16 to keep only up to block3_pool (downsampling by 1/8)
+    truncated_output = full_vgg.get_layer('block3_pool').output
+    vgg = Model(inputs=full_vgg.input, outputs=truncated_output,name='truncated_vgg16')
 
-def create_CSRNet_model(input_shape=(240, 320, 4)):
-    input_tensor = layers.Input(shape=input_shape)
-    x = preprocessing_module(input_tensor)  # Output shape (240,320,3)
-    
-    vgg = VGG16(include_top=False, weights='imagenet', input_shape=(240,320,3))
-    x = vgg(x)  # Use VGG16 as a layer on preprocessed output
+    # Freeze VGG16 layers
+    for layer in vgg.layers:
+        layer.trainable = False
 
-    # Continue with CSRNet backend
+    x = vgg(x)  # Apply truncated VGG to preprocessed input
+
+    # CSRNet backend
     init = RandomNormal(stddev=0.01, seed=123)
     x = layers.Conv2D(512, (3, 3), activation='relu', dilation_rate=2, kernel_initializer=init, padding='same')(x)
     x = layers.Conv2D(512, (3, 3), activation='relu', dilation_rate=2, kernel_initializer=init, padding='same')(x)
@@ -152,7 +141,6 @@ def create_CSRNet_model(input_shape=(240, 320, 4)):
 
     model = models.Model(inputs=input_tensor, outputs=output)
     return model
-
 
 def preprocessing_module(input_tensor):
     x = layers.Conv2D(64, (3, 3), padding='same', activation='relu')(input_tensor)

@@ -81,61 +81,6 @@ class DataGenerator_count(Sequence):
 
         return np.array(X), np.array(y).astype(float)
     
-class DataGenerator_count_old(Sequence):
-    def __init__(self, dataframe, batch_size=32, shuffle=True, target_size=(224, 224), model_name="vgg16"):
-        self.df = dataframe
-        self.batch_size = batch_size
-        self.shuffle = shuffle
-        self.frames_dir = FRAMES_PATH
-        self.target_size = target_size
-        self.model_name = model_name
-        if self.shuffle:
-            self.on_epoch_end()
-
-
-    def __len__(self):
-        return np.ceil(len(self.df) / self.batch_size).astype(int)
-
-    def resize_image(self, image):
-        # Ridimensiona l'immagine alle dimensioni target (e.g., 224x224)
-        image_resized = cv2.resize(image, self.target_size)
-        return image_resized
-
-    def preprocess_image(self, image):
-        image = image.astype(np.float32)
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-
-        if self.model_name == "resnet":
-            return resnet_preprocess(image)
-        elif self.model_name == "vgg16":
-            return vgg_preprocess(image)
-        elif self.model_name == "vgg19":
-            return vgg19_preprocess(image)
-        elif self.model_name == "xception":
-            return xception_preprocess(image)
-
-    def on_epoch_end(self):
-        if self.shuffle:
-            self.df = self.df.sample(frac=1).reset_index(drop=True)
-    def __getitem__(self, idx):
-        # Estrae il batch di immagini
-        batch_df = self.df[idx * self.batch_size:(idx + 1) * self.batch_size]
-        X, y = [], []
-
-        for _, row in batch_df.iterrows():
-            image_path = os.path.join(self.frames_dir, row.image_name)
-            image = cv2.imread(image_path)
-            if image is not None:
-                image = self.preprocess_image(self.resize_image(image))  # Applica resize e normalization  # Normalizza l'immagine
-                X.append(image)
-                y.append(row['count'])  # Usa il numero di persone come target
-            else:
-                print(f"Warning: Could not load image at {image_path}")
-
-        X = np.array(X)
-        y = np.array(y)
-        return np.array(X), np.array(y).astype(float) # Converti y in formato float per la regressione
-    
 class DataGenerator_density(Sequence):
     def __init__(self, dataframe, batch_size=32, shuffle=True, target_size=(240, 320), seed=42):
         self.df = dataframe

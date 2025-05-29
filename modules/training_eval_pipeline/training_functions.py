@@ -10,23 +10,14 @@ def euclidean_loss(y_true, y_pred):
     return loss
 
 def compile_model(model_name:str):
-    """
-    Compile the model with the specified name.
-    
-    Args:
-        model_name (str): The name of the model to compile.
-        
-    Returns:
-        model: Compiled Keras model.
-    """
     # Load model parameters from YAML
     model_params = load_model_config(model_name)['parameters']
 
 
     # Map loss name from YAML to actual function or string
     loss_functions = {
-        "mse": "mean_squared_error",       # Built-in
-        "euclidean_loss": euclidean_loss   # Custom
+        "mse": "mean_squared_error",       
+        "euclidean_loss": euclidean_loss   
     }
     loss_name = model_params["loss"]
     loss_to_use = loss_functions.get(loss_name, "mean_squared_error")
@@ -41,23 +32,12 @@ def compile_model(model_name:str):
 
     return model
 
-def fit_model(model_name:str, model=None,train_generator=None, valid_generator=None):
-    """
-    Fit the model with the specified name.
+def fit_model_using_best_parameters(model_name:str, model=None,train_generator=None, valid_generator=None):
     
-    Args:
-        model_name (str): The name of the model to fit.
-        
-    Returns:
-        history: Training history.
-    """
     # Load model parameters from YAML
     model_params = load_model_config(model_name)['parameters']
-
-    # Create data generators
-    #train_generator, valid_generator,_ = get_new_generators(model_type=model_name)
     
-    es = EarlyStopping(monitor=model_params['monitor'], #da cambiare in base alla loss (val_mae per MSE, val_mse per euclidean)
+    es = EarlyStopping(monitor=model_params['monitor'], 
                    mode='min',
                    patience=model_params['es_patience'])
     

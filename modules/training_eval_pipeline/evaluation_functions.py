@@ -9,7 +9,7 @@ def evaluate_model(model, test_generator):
 
     for i in range(test_generator.__len__()):
         batch_images, batch_labels = test_generator[i]
-        predicted_counts.append(full_eval(batch_images, model, smooth=False))
+        predicted_counts.append(get_model_predictions(model, batch_images, smooth=False))
         true_counts.append(batch_labels)
     
     return np.concatenate(true_counts), np.concatenate(predicted_counts)
@@ -33,20 +33,22 @@ def print_metrics(metrics):
     print(f"Pearson Correlation: {metrics['Pearson Correlation']:.2f}")
     print(f"RMSE: {metrics['RMSE']:.2f}")
 
-def full_eval(x, model, smooth=False):
-    batch_size = x.shape[0]
-    counts_batch = np.zeros(batch_size)
+def get_model_predictions(model, X, smooth=False, sigma=2):
 
-    for b in range(batch_size):
-        predicted_count = model.predict(x[b:b+1])[0]
+    predictions = model.predict(X, batch_size=32, verbose=0)
 
+    # If output is a single count per image
+    if predictions.ndim == 1 or predictions.shape[1] == 1:
+        return predictions.flatten()
+
+    # If output is a density map
+    counts = []
+    for i in range(len(predictions)):
+        density_map = predictions[i]
         if smooth:
-            density_map = model.predict(x[b:b+1])[0]
-            density_map = gaussian_filter(density_map, 2, mode='constant')
-            predicted_count = np.sum(density_map)
+            density_map = gaussian_filter(density_map, sigma=sigma, mode='constant')
+        count = np.sum(density_map)
+        counts.append(count)
 
-        counts_batch[b] = predicted_count
-
-    return counts_batch
-
+    return np.array(counts)
 
