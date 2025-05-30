@@ -82,27 +82,68 @@ def plot_headcount_frequency_histogram():
     # Plot histogram
     plot_histogram_with_median(num_heads_list)
 
-def plot_density_comparisons(ground_truths,predictions, num_samples=3):
+def reverse_vgg_preprocessing(x):
+    """
+    Reverses VGG16 preprocessing on a single image or batch.
+    Assumes input is float32 in BGR with mean subtracted.
+    Returns RGB image in [0, 255].
+    """
+    x = x.copy()
+    if x.ndim == 4:  # batch
+        x[..., 0] += 103.939  # B
+        x[..., 1] += 116.779  # G
+        x[..., 2] += 123.68   # R
+        x = x[..., ::-1]  # BGR to RGB
+    elif x.ndim == 3:  # single image
+        x[..., 0] += 103.939
+        x[..., 1] += 116.779
+        x[..., 2] += 123.68
+        x = x[..., ::-1]
+    return np.clip(x, 0, 255).astype(np.uint8)
 
-    assert len(predictions) == len(ground_truths), "Predictions and ground truths must have the same length."
-    
-    total_samples = len(predictions)
-    indices = np.random.choice(total_samples, size=num_samples, replace=False)
-    
-    fig, axes = plt.subplots(num_samples, 2, figsize=(8, 4 * num_samples))
-    
+
+def plot_density_map_comparisons(test_generator, model, num_samples=3, random_seed=42):
+    random.seed(random_seed)
+    np.random.seed(random_seed)
+
+    # Get one random batch
+    X_batch, y_batch = next(iter(test_generator))
+
+    # Predict the density maps
+    y_pred = model.predict(X_batch)
+
+    # Choose random indices from the batch
+    indices = np.random.choice(range(X_batch.shape[0]), size=num_samples, replace=False)
+
     for i, idx in enumerate(indices):
-        # Predicted
-        ax_pred = axes[i, 0] if num_samples > 1 else axes[0]
-        ax_pred.imshow(predictions[idx], cmap='viridis')
-        ax_pred.set_title(f"Predicted #{idx}")
-        ax_pred.axis('off')
-        
-        # Ground truth
-        ax_gt = axes[i, 1] if num_samples > 1 else axes[1]
-        ax_gt.imshow(ground_truths[idx], cmap='viridis')
-        ax_gt.set_title(f"Ground Truth #{idx}")
-        ax_gt.axis('off')
-    
-    plt.tight_layout()
-    plt.show()
+        original_img = reverse_vgg_preprocessing(X_batch[idx][..., :3])  # Take RGB channels
+        ground_truth = y_batch[idx].squeeze()
+        prediction = y_pred[idx].squeeze()
+
+        # Calculate counts
+        gt_count = np.round(np.sum(ground_truth))
+        pred_count = np.round(np.sum(prediction))
+
+        # Plotting
+        plt.figure(figsize=(12, 4))
+        plt.suptitle(f"Sample {i+1}", fontsize=16)
+
+        plt.subplot(1, 3, 1)
+        plt.imshow(original_img)
+        plt.title("Original Image")
+        plt.axis('off')
+
+        plt.subplot(1, 3, 2)
+        plt.imshow(ground_truth, cmap='jet')
+        plt.title(f"Ground Truth\nCount: {int(gt_count)}")
+        plt.colorbar()
+        plt.axis('off')
+
+        plt.subplot(1, 3, 3)
+        plt.imshow(prediction, cmap='jet')
+        plt.title(f"Predicted\nCount: {int(pred_count)}")
+        plt.colorbar()
+        plt.axis('off')
+
+        plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+        plt.show()
