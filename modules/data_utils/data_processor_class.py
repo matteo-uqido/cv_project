@@ -12,7 +12,7 @@ import tensorflow as tf
 
 from modules.data_utils.density_map_utils import create_density_map
 
-class DataGenerator_count(Sequence):
+class DataGenerator_crowd_counting_models(Sequence):
     def __init__(self, dataframe, batch_size=32, shuffle=True, target_size=(224, 224),
                  model_name="vgg16", augment=False, seed=42):
         self.df = dataframe
@@ -28,8 +28,6 @@ class DataGenerator_count(Sequence):
             self.augmenter = tf.keras.Sequential([
                 tf.keras.layers.RandomFlip("horizontal", seed=self.seed),
                 tf.keras.layers.RandomRotation(0.05, seed=self.seed),
-                tf.keras.layers.RandomZoom(0.1, seed=self.seed),
-                tf.keras.layers.RandomContrast(0.1, seed=self.seed)
             ])
 
         if self.shuffle:
@@ -81,8 +79,9 @@ class DataGenerator_count(Sequence):
 
         return np.array(X), np.array(y).astype(float)
     
-class DataGenerator_density(Sequence):
-    def __init__(self, dataframe, batch_size=32, shuffle=True, target_size=(240, 320), seed=42):
+class DataGenerator_Csrnet(Sequence):
+    def __init__(self, dataframe, batch_size=32, shuffle=True, target_size=(240, 320), seed=42,is_standard_model=True):
+        self.standard_model = is_standard_model
         self.df = dataframe
         self.batch_size = batch_size
         self.shuffle = shuffle
@@ -119,7 +118,7 @@ class DataGenerator_density(Sequence):
             cache_key = row['image_name']
 
             if cache_key in self.cache:
-                image_with_density, resized_density_map = self.cache[cache_key]
+                image, resized_density_map = self.cache[cache_key]
             else:
                 image_annotations = row['annotations']
                 image_density_map = create_density_map(image_annotations)
@@ -144,15 +143,16 @@ class DataGenerator_density(Sequence):
                     image = self.resize_image(image)
                     image = self.preprocess_image(image)
 
-                    image_density_map_channel = image_density_map[:, :, np.newaxis]
-                    image_with_density = np.concatenate((image, image_density_map_channel), axis=-1)
+                    if self.standard_model is False:
+                        image_density_map_channel = image_density_map[:, :, np.newaxis]
+                        image = np.concatenate((image, image_density_map_channel), axis=-1)
 
-                    self.cache[cache_key] = (image_with_density, resized_density_map)
+                    self.cache[cache_key] = (image, resized_density_map)
                 else:
                     print(f"Warning: Could not load image at {image_path}")
                     continue
 
-            X.append(image_with_density)
+            X.append(image)
             y.append(resized_density_map)
 
         return np.array(X), np.array(y, dtype=np.float32)

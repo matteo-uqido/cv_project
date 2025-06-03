@@ -1,5 +1,5 @@
 try:
-    from tensorflow.keras import layers, models
+    from tensorflow.keras import layers, models, Input
     from tensorflow.keras.models import Model
     from tensorflow.keras.layers import Dense
     from tensorflow.keras.applications import VGG16
@@ -22,10 +22,12 @@ def create_chosen_model(model_type: str):
         return create_vgg19_model()
     elif model_type == 'xception':
         return create_xception_model()
+    elif model_type == 'modified_csrnet':
+        return create_modified_CSRNet_model()
     elif model_type == 'csrnet':
-        return create_CSRNet_model()
+        return create_CSRNET_model()
     else:
-        raise ValueError(f"Unsupported model_type: {model_type}. Choose from 'resnet50', 'vgg16', 'vgg19', 'xception'.")
+        raise ValueError(f"Unsupported model_type: {model_type}")
 
 
 def create_resnet50_model():
@@ -111,7 +113,42 @@ def create_xception_model():
 
     return model
 
-def create_CSRNet_model():
+def create_CSRNET_model():
+    input_shape = (240, 320, 3)
+    init = RandomNormal(stddev=0.01, seed=123)
+
+    input_tensor = Input(shape=input_shape)
+
+    # Load full VGG16 without top, using the input_tensor
+    full_vgg = VGG16(include_top=False, weights='imagenet', input_tensor=input_tensor)
+
+    # Take all layers except the last 6 layers of full VGG16
+    truncated_layers = full_vgg.layers[:-6]
+    x = input_tensor
+    for layer in truncated_layers[1:]:  # skip the InputLayer at index 0
+        x = layer(x)
+
+    x = layers.Conv2D(512, (3, 3), activation='relu', dilation_rate=2,
+                      kernel_initializer=init, padding='same')(x)
+    x = layers.Conv2D(512, (3, 3), activation='relu', dilation_rate=2,
+                      kernel_initializer=init, padding='same')(x)
+    x = layers.Conv2D(512, (3, 3), activation='relu', dilation_rate=2,
+                      kernel_initializer=init, padding='same')(x)
+    x = layers.Conv2D(256, (3, 3), activation='relu', dilation_rate=2,
+                      kernel_initializer=init, padding='same')(x)
+    x = layers.Conv2D(128, (3, 3), activation='relu', dilation_rate=2,
+                      kernel_initializer=init, padding='same')(x)
+    x = layers.Conv2D(64, (3, 3), activation='relu', dilation_rate=2,
+                      kernel_initializer=init, padding='same')(x)
+
+    output = layers.Conv2D(1, (1, 1), dilation_rate=1,
+                           kernel_initializer=init, padding='same')(x)
+
+    model = models.Model(inputs=input_tensor, outputs=output)
+
+    return model
+
+def create_modified_CSRNet_model():
     data_processor_shape = (240, 320, 4)
     input_tensor = layers.Input(shape=data_processor_shape)
     x = preprocessing_module(input_tensor)  # Output: (240, 320, 3)

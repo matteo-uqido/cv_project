@@ -33,7 +33,8 @@ xception:
     metrics: ['mae']
     es_patience: 3
     monitor: val_mae     # ← if using 'euclidean', change to 'val_mse'
-csrnet:
+    
+modified_csrnet:
   parameters:
     adam_lr: 0.0001
     epochs: 1
@@ -42,3 +43,11 @@ csrnet:
     es_patience: 10
     monitor: val_mae     # ← if using 'euclidean', change to 'val_mse'
 
+csrnet:
+  parameters:
+    adam_lr: 0.0001
+    epochs: 1
+    loss: mse
+    metrics: ['mae']
+    es_patience: 10
+    monitor: val_mae     # ← if using 'euclidean', change to 'val_mse'
