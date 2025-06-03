@@ -68,7 +68,6 @@ def get_new_generators(batch_size=32, model_name=None, augment_data=False):
             train_df,
             batch_size,
             target_size=target_size,
-            model_name=model_name,
             is_standard_model=False
         )
         valid_generator = create_generator(
@@ -76,18 +75,16 @@ def get_new_generators(batch_size=32, model_name=None, augment_data=False):
             valid_df,
             batch_size,
             target_size=target_size,
-            model_name=model_name,
             shuffle=False,
-            is_standard_model=False
+            is_standard_model=True
         )
         test_generator = create_generator(
             DataGenerator_Csrnet,
             test_df,
             batch_size,
             target_size=target_size,
-            model_name=model_name,
             shuffle=False,
-            is_standard_model=False
+            is_standard_model=True
         )
 
     else:
