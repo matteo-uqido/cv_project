@@ -82,25 +82,17 @@ def plot_headcount_frequency_histogram():
     # Plot histogram
     plot_histogram_with_median(num_heads_list)
 
-def reverse_vgg_preprocessing(x):
-    """
-    Reverses VGG16 preprocessing on a single image or batch.
-    Assumes input is float32 in BGR with mean subtracted.
-    Returns RGB image in [0, 255].
-    """
-    x = x.copy()
-    if x.ndim == 4:  # batch
-        x[..., 0] += 103.939  # B
-        x[..., 1] += 116.779  # G
-        x[..., 2] += 123.68   # R
-        x = x[..., ::-1]  # BGR to RGB
-    elif x.ndim == 3:  # single image
-        x[..., 0] += 103.939
-        x[..., 1] += 116.779
-        x[..., 2] += 123.68
-        x = x[..., ::-1]
-    return np.clip(x, 0, 255).astype(np.uint8)
+def reverse_preprocessing(x):
+    image = x.copy()  l
 
+    image[:, :, 0] = image[:, :, 0] * 0.229 + 0.485  # R
+    image[:, :, 1] = image[:, :, 1] * 0.224 + 0.456  # G
+    image[:, :, 2] = image[:, :, 2] * 0.225 + 0.406  # B
+
+    image = image * 255.0
+    image = np.clip(image, 0, 255).astype(np.uint8)
+
+    return image
 
 def plot_density_map_comparisons(test_generator, model, num_samples=3, random_seed=42):
     random.seed(random_seed)
@@ -116,7 +108,7 @@ def plot_density_map_comparisons(test_generator, model, num_samples=3, random_se
     indices = np.random.choice(range(X_batch.shape[0]), size=num_samples, replace=False)
 
     for i, idx in enumerate(indices):
-        original_img = reverse_vgg_preprocessing(X_batch[idx][..., :3])  # Take RGB channels
+        original_img = reverse_preprocessing(X_batch[idx][..., :3])  # Take RGB channels
         ground_truth = y_batch[idx].squeeze()
         prediction = y_pred[idx].squeeze()
 
