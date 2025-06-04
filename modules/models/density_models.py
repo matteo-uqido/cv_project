@@ -13,7 +13,7 @@ def create_CSRNET_model():
     full_vgg = VGG16(include_top=False, weights='imagenet', input_tensor=input_tensor)
 
     # Take all layers except the last 6 layers of full VGG16
-    truncated_layers = full_vgg.layers[:-6]
+    truncated_layers = full_vgg.layers[:-5]
     x = input_tensor
     for layer in truncated_layers[1:]:  # skip the InputLayer at index 0
         x = layer(x)
@@ -49,7 +49,7 @@ def build_preprocessing_module():
 
 def build_truncated_vgg():
     full_vgg = VGG16(include_top=False, weights='imagenet', input_shape=(240, 320, 3))
-    truncated_output = full_vgg.layers[-7].output
+    truncated_output = full_vgg.layers[-6].output
     #truncated_output = full_vgg.get_layer('block3_pool').output
     vgg = Model(inputs=full_vgg.input, outputs=truncated_output, name='truncated_vgg16')
     return vgg

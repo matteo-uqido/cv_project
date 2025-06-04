@@ -103,7 +103,12 @@ class DataGenerator_Csrnet(Sequence):
     def preprocess_image(self, image):
         image = image.astype(np.float32)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        image = vgg_preprocess(image)
+        image = image / 255.0
+
+        image[:, :, 0] = (image[:, :, 0] - 0.485) / 0.229
+        image[:, :, 1] = (image[:, :, 1] - 0.456) / 0.224
+        image[:, :, 2] = (image[:, :, 2] - 0.406) / 0.225
+
         return image
 
     def on_epoch_end(self):
