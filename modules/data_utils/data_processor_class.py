@@ -80,8 +80,8 @@ class DataGenerator_crowd_counting_models(Sequence):
         return np.array(X), np.array(y).astype(float)
     
 class DataGenerator_Csrnet(Sequence):
-    def __init__(self, dataframe, batch_size=32, shuffle=True, target_size=(240, 320), seed=42,is_standard_model=True):
-        self.standard_model = is_standard_model
+    def __init__(self, dataframe, batch_size=32, shuffle=True, target_size=(240, 320), seed=42,has_fourth_channel=False):
+        self.fourth_channel = has_fourth_channel
         self.df = dataframe
         self.batch_size = batch_size
         self.shuffle = shuffle
@@ -143,7 +143,7 @@ class DataGenerator_Csrnet(Sequence):
                     image = self.resize_image(image)
                     image = self.preprocess_image(image)
 
-                    if self.standard_model is False:
+                    if self.fourth_channel is True:
                         image_density_map_channel = image_density_map[:, :, np.newaxis]
                         image = np.concatenate((image, image_density_map_channel), axis=-1)
 

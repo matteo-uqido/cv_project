@@ -45,21 +45,24 @@ def get_new_generators(batch_size=32, model_name=None, augment_data=False):
             train_df,
             batch_size,
             shuffle=True,
-            target_size=target_size
+            target_size=target_size,
+            has_fourth_channel=False
         )
         valid_generator = create_generator(
             DataGenerator_Csrnet,
             valid_df,
             batch_size,
             shuffle=False,
-            target_size=target_size
+            target_size=target_size,
+            has_fourth_channel=False
         )
         test_generator = create_generator(
             DataGenerator_Csrnet,
             test_df,
             batch_size,
             shuffle=False,
-            target_size=target_size
+            target_size=target_size,
+            has_fourth_channel=False
         )
 
     elif model_name == "modified_csrnet":
@@ -68,7 +71,8 @@ def get_new_generators(batch_size=32, model_name=None, augment_data=False):
             train_df,
             batch_size,
             target_size=target_size,
-            is_standard_model=False
+            has_fourth_channel=True,
+            shuffle=True
         )
         valid_generator = create_generator(
             DataGenerator_Csrnet,
@@ -76,7 +80,7 @@ def get_new_generators(batch_size=32, model_name=None, augment_data=False):
             batch_size,
             target_size=target_size,
             shuffle=False,
-            is_standard_model=True
+            has_fourth_channel=False
         )
         test_generator = create_generator(
             DataGenerator_Csrnet,
@@ -84,7 +88,7 @@ def get_new_generators(batch_size=32, model_name=None, augment_data=False):
             batch_size,
             target_size=target_size,
             shuffle=False,
-            is_standard_model=True
+            has_fourth_channel=False
         )
 
     else:

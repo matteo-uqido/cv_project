@@ -2,7 +2,7 @@ import numpy as np
 from scipy.ndimage import gaussian_filter
 from scipy.spatial import KDTree
 #takes as input a list of lists of head positions
-def create_ground_truth(head_positions, height=480, width=640):
+def create_ground_truth(head_positions, height=None, width=None):
     ground_truth = np.zeros((height, width), dtype=np.float32)
     for pos in head_positions:
         x, y = pos
