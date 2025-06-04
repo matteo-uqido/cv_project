@@ -19,9 +19,7 @@ def create_resnet50_model():
     k = -7
     for layer in model.layers[:k]:
         layer.trainable = False
-    print('Trainable:')
     for layer in model.layers[k:]:
-        print(layer.name)
         layer.trainable = True
 
     return model
@@ -41,9 +39,7 @@ def create_vgg16_model():
     k = -7
     for layer in model.layers[:k]:
         layer.trainable = False
-    print('Trainable:')
     for layer in model.layers[k:]:
-        print(layer.name)
         layer.trainable = True
 
     return model
@@ -63,9 +59,7 @@ def create_vgg19_model():
     k = -7
     for layer in model.layers[:k]:
         layer.trainable = False
-    print('Trainable:')
     for layer in model.layers[k:]:
-        print(layer.name)
         layer.trainable = True
 
     return model
