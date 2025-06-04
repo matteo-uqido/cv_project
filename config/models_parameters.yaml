@@ -49,5 +49,5 @@ csrnet:
     epochs: 1
     loss: mse
     metrics: ['mae']
-    es_patience: 10
+    es_patience: 3
     monitor: val_mae     # ← if using 'euclidean', change to 'val_mse'

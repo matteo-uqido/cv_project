@@ -83,7 +83,7 @@ def plot_headcount_frequency_histogram():
     plot_histogram_with_median(num_heads_list)
 
 def reverse_preprocessing(x):
-    image = x.copy()  l
+    image = x.copy() 
 
     image[:, :, 0] = image[:, :, 0] * 0.229 + 0.485  # R
     image[:, :, 1] = image[:, :, 1] * 0.224 + 0.456  # G
