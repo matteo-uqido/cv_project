@@ -7,7 +7,7 @@ def create_resnet50_model():
     base_model = resnet50.ResNet50(
         weights='imagenet',  
         include_top=False,  
-        input_shape=(224, 224, 3),  
+        input_shape=(240, 320, 3),  
         pooling='avg', 
     )
     
@@ -23,11 +23,12 @@ def create_resnet50_model():
         layer.trainable = True
 
     return model
+
 def create_vgg16_model():
     base_model = vgg16.VGG16(
         weights='imagenet',  
         include_top=False,  
-        input_shape=(224, 224, 3),  
+        input_shape=(240, 320, 3),  
         pooling='avg', 
     )
     
@@ -43,11 +44,12 @@ def create_vgg16_model():
         layer.trainable = True
 
     return model
+
 def create_vgg19_model():
     base_model = vgg19.VGG19(
         weights='imagenet',  
         include_top=False,  
-        input_shape=(224, 224, 3),  
+        input_shape=(240, 320, 3),  
         pooling='avg', 
     )
     
@@ -63,11 +65,12 @@ def create_vgg19_model():
         layer.trainable = True
 
     return model
+
 def create_xception_model():
     base_model = xception.Xception(
         weights='imagenet',  
         include_top=False,  
-        input_shape=(224, 224, 3),  
+        input_shape=(240, 320, 3),  
         pooling='avg', 
     )
     for layer in base_model.layers:

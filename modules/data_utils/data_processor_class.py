@@ -13,7 +13,7 @@ import tensorflow as tf
 from modules.data_utils.density_map_utils import create_density_map
 
 class DataGenerator_crowd_counting_models(Sequence):
-    def __init__(self, dataframe, batch_size=32, shuffle=True, target_size=(224, 224),
+    def __init__(self, dataframe, batch_size=32, shuffle=True, target_size=(240, 320),
                  model_name="vgg16", augment=False, seed=42):
         self.df = dataframe
         self.batch_size = batch_size
@@ -37,7 +37,8 @@ class DataGenerator_crowd_counting_models(Sequence):
         return np.ceil(len(self.df) / self.batch_size).astype(int)
 
     def resize_image(self, image):
-        return cv2.resize(image, self.target_size, interpolation=cv2.INTER_AREA)
+        return cv2.resize(image, (self.target_size[1], self.target_size[0]), interpolation=cv2.INTER_AREA)
+
 
     def preprocess_image(self, image):
         image = image.astype(np.float32)
@@ -80,8 +81,7 @@ class DataGenerator_crowd_counting_models(Sequence):
         return np.array(X), np.array(y).astype(float)
     
 class DataGenerator_Csrnet(Sequence):
-    def __init__(self, dataframe, batch_size=32, shuffle=True, target_size=(240, 320), seed=42,has_fourth_channel=False):
-        self.fourth_channel = has_fourth_channel
+    def __init__(self, dataframe, batch_size=32, shuffle=True, target_size=(240, 320), seed=42):
         self.df = dataframe
         self.batch_size = batch_size
         self.shuffle = shuffle
@@ -123,23 +123,10 @@ class DataGenerator_Csrnet(Sequence):
             cache_key = row['image_name']
 
             if cache_key in self.cache:
-                image, resized_density_map = self.cache[cache_key]
+                image, density_map = self.cache[cache_key]
             else:
                 image_annotations = row['annotations']
-                image_density_map = create_density_map(image_annotations)
-
-                density_map_target_size = (self.target_size[1] // 8, self.target_size[0] // 8)
-                resized_density_map = cv2.resize(
-                    image_density_map,
-                    density_map_target_size,
-                    interpolation=cv2.INTER_AREA
-                )
-
-                # Scale to preserve total count
-                original_pixel_count = self.target_size[0] * self.target_size[1]
-                new_pixel_count = density_map_target_size[0] * density_map_target_size[1]
-                scaling_factor = original_pixel_count / new_pixel_count
-                resized_density_map *= scaling_factor
+                density_map = create_density_map(image_annotations,beta=0.1)  # Directly create density map
 
                 image_path = os.path.join(self.frames_dir, row.image_name)
                 image = cv2.imread(image_path)
@@ -148,17 +135,13 @@ class DataGenerator_Csrnet(Sequence):
                     image = self.resize_image(image)
                     image = self.preprocess_image(image)
 
-                    if self.fourth_channel is True:
-                        image_density_map_channel = image_density_map[:, :, np.newaxis]
-                        image = np.concatenate((image, image_density_map_channel), axis=-1)
-
-                    self.cache[cache_key] = (image, resized_density_map)
+                    self.cache[cache_key] = (image, density_map)
                 else:
                     print(f"Warning: Could not load image at {image_path}")
                     continue
 
             X.append(image)
-            y.append(resized_density_map)
+            y.append(density_map)
 
         return np.array(X), np.array(y, dtype=np.float32)
 

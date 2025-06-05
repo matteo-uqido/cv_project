@@ -37,7 +37,7 @@ def get_new_generators(batch_size=32, model_name=None, augment_data=False):
 
     train_df, valid_df, test_df = get_train_test_val_partition(DATA_PATH)
 
-    target_size = (240, 320) if model_name in ["csrnet", "modified_csrnet"] else (224, 224)
+    target_size = (240, 320) 
 
     if model_name == "csrnet":
         train_generator = create_generator(
@@ -45,51 +45,23 @@ def get_new_generators(batch_size=32, model_name=None, augment_data=False):
             train_df,
             batch_size,
             shuffle=True,
-            target_size=target_size,
-            has_fourth_channel=False
+            target_size=target_size
         )
         valid_generator = create_generator(
             DataGenerator_Csrnet,
             valid_df,
             batch_size,
             shuffle=False,
-            target_size=target_size,
-            has_fourth_channel=False
+            target_size=target_size
         )
         test_generator = create_generator(
             DataGenerator_Csrnet,
             test_df,
             batch_size,
             shuffle=False,
-            target_size=target_size,
-            has_fourth_channel=False
+            target_size=target_size
         )
 
-    elif model_name == "modified_csrnet":
-        train_generator = create_generator(
-            DataGenerator_Csrnet,
-            train_df,
-            batch_size,
-            target_size=target_size,
-            has_fourth_channel=True,
-            shuffle=True
-        )
-        valid_generator = create_generator(
-            DataGenerator_Csrnet,
-            valid_df,
-            batch_size,
-            target_size=target_size,
-            shuffle=False,
-            has_fourth_channel=False
-        )
-        test_generator = create_generator(
-            DataGenerator_Csrnet,
-            test_df,
-            batch_size,
-            target_size=target_size,
-            shuffle=False,
-            has_fourth_channel=False
-        )
 
     else:
         train_generator = create_generator(
