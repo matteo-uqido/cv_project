@@ -161,7 +161,7 @@ def plot_preprocessing_output_comparison(trained_model, test_generator, num_samp
 
         # Extract RGB channels and combined output
         original_img = reverse_preprocessing(X_batch[idx][..., :3])  # Take RGB channels
-        density_map = X_batch[idx][..., 3]  # Extract the density map (fourth channel)
+        density_map = y_batch[idx].squeeze()  # Take density map from y_batch
         combined_output = preprocessed_output  # All 3 channels (mixed RGB + density map)
 
         # Plotting
