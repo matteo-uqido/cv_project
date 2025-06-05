@@ -39,13 +39,38 @@ def create_CSRNET_model():
     return model
 
 def build_preprocessing_module():
-    input_tensor = Input(shape=(240, 320, 4))
-    x = layers.Conv2D(64, (3, 3), padding='same', activation='relu')(input_tensor)
-    x = layers.BatchNormalization()(x)
-    x = layers.Conv2D(64, (3, 3), padding='same', activation='relu')(x)
-    x = layers.BatchNormalization()(x)
-    x = layers.Conv2D(3, (1, 1), padding='same', activation='linear')(x)  # Output 3 channels
-    return Model(inputs=input_tensor, outputs=x, name="preprocessing_module")
+    input_tensor = Input(shape=(240, 320, 4))  # Input with 4 channels (RGB + density map)
+
+    # Process RGB channels
+    rgb_channels = layers.Lambda(lambda x: x[..., :3])(input_tensor)  # Extract RGB channels
+    x_rgb = layers.Conv2D(64, (3, 3), padding='same', kernel_initializer='he_normal')(rgb_channels)
+    x_rgb = layers.BatchNormalization()(x_rgb)  
+    x_rgb = layers.Activation('relu')(x_rgb)
+
+    x_rgb = layers.Conv2D(64, (3, 3), padding='same', kernel_initializer='he_normal')(x_rgb)
+    x_rgb = layers.BatchNormalization()(x_rgb)  
+    x_rgb = layers.Activation('relu')(x_rgb)
+
+    x_rgb = layers.Conv2D(3, (1, 1), padding='same', kernel_initializer='he_normal')(x_rgb)
+    x_rgb = layers.BatchNormalization()(x_rgb)  
+    x_rgb = layers.Activation('linear')(x_rgb)  # Linear activation for final output
+
+    # Process density map
+    density_map = layers.Lambda(lambda x: x[..., 3:])(input_tensor)  # Extract density map
+    x_density = layers.Conv2D(32, (3, 3), padding='same', kernel_initializer='he_normal')(density_map)
+    x_density = layers.BatchNormalization()(x_density)  
+    x_density = layers.Activation('relu')(x_density)
+
+    x_density = layers.Conv2D(3, (1, 1), padding='same', kernel_initializer='he_normal')(x_density)
+    x_density = layers.BatchNormalization()(x_density)  
+    x_density = layers.Activation('sigmoid')(x_density)  # Normalize density map
+
+    # Weighted mixing
+    weights_rgb = layers.Conv2D(3, (1, 1), kernel_initializer='he_normal', activation='linear')(x_rgb)  # Learnable weights for RGB
+    weights_density = layers.Conv2D(3, (1, 1), kernel_initializer='he_normal', activation='linear')(x_density)  
+    combined = layers.Add()([weights_rgb, weights_density])  # Element-wise addition to mix channels
+
+    return Model(inputs=input_tensor, outputs=combined, name="preprocessing_module")
 
 def build_truncated_vgg():
     full_vgg = VGG16(include_top=False, weights='imagenet', input_shape=(240, 320, 3))
