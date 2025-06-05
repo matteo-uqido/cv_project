@@ -40,7 +40,8 @@ def fit_model_using_best_parameters(model_name:str, model=None,train_generator=N
     es = EarlyStopping(monitor=model_params['monitor'], 
                    mode='min',
                    patience=model_params['es_patience'],
-                   restore_best_weights=True)
+                   restore_best_weights=True,
+                   min_delta=model_params['es_min_delta'],)
     
     learning_rate_reduction = ReduceLROnPlateau(
         monitor=model_params['monitor'],  # Track the score on the validation set
