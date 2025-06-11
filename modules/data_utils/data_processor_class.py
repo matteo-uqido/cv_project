@@ -127,6 +127,19 @@ class DataGenerator_Csrnet(Sequence):
             else:
                 image_annotations = row['annotations']
                 density_map = create_density_map(image_annotations,beta=0.1)  # Directly create density map
+                density_map_target_size = (self.target_size[1] // 8, self.target_size[0] // 8)
+                resized_density_map = cv2.resize(
+                    density_map,
+                    density_map_target_size,
+                    interpolation=cv2.INTER_AREA
+                )
+
+                # Scale to preserve total count
+                original_pixel_count = self.target_size[0] * self.target_size[1]
+                new_pixel_count = density_map_target_size[0] * density_map_target_size[1]
+                scaling_factor = original_pixel_count / new_pixel_count
+                resized_density_map *= scaling_factor
+
 
                 image_path = os.path.join(self.frames_dir, row.image_name)
                 image = cv2.imread(image_path)
@@ -141,7 +154,7 @@ class DataGenerator_Csrnet(Sequence):
                     continue
 
             X.append(image)
-            y.append(density_map)
+            y.append(resized_density_map)
 
         return np.array(X), np.array(y, dtype=np.float32)
 

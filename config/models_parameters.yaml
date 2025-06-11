@@ -38,16 +38,6 @@ xception:
     monitor: val_mae
     es_min_delta: 0.001
 
-modified_csrnet:
-  parameters:
-    adam_lr: 0.0001
-    epochs: 1
-    loss: mse
-    metrics: ['mae']
-    es_patience: 10
-    monitor: val_mae
-    es_min_delta: 0.001
-
 csrnet:
   parameters:
     adam_lr: 0.0001
