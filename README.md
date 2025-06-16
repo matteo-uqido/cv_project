@@ -24,19 +24,21 @@ The repository is structured to ensure **scalability**, **modularity**, and **ea
 
 ## Repository Structure
 
+```bash
 cv_project/
 ├── config/
-│ ├── models_parameters.yaml # Hyperparameters for each model
-│ └── config_loader.py # Utility for loading configurations
+│   ├── models_parameters.yaml       # Hyperparameters for each model
+│   └── config_loader.py             # Utility for loading configurations
 ├── modules/
-│ ├── models/
-│ │ ├── create_desired_model.py # Factory for model creation
-│ │ ├── CSRNET_model.py # CSRNet implementation
-│ │ └── crowd_counting_models.py # ResNet50, VGG16, VGG19, Xception implementations
-│ ├── training_eval_pipeline/
-│ │ ├── training_functions.py # Training and evaluation logic
-│ │ └── evaluation_functions.py # Evaluation metrics and utilities
-└── README.md # Project documentation
+│   ├── models/
+│   │   ├── create_desired_model.py  # Factory for model creation
+│   │   ├── CSRNET_model.py          # CSRNet implementation
+│   │   └── crowd_counting_models.py # ResNet50, VGG16, VGG19, Xception implementations
+│   ├── training_eval_pipeline/
+│   │   ├── training_functions.py    # Training and evaluation logic
+│   │   └── evaluation_functions.py  # Evaluation metrics and utilities
+└── README.md                        # Project documentation
+'''
 
 # Project documentation
 
