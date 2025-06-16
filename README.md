@@ -26,18 +26,27 @@ The repository is structured to ensure **scalability**, **modularity**, and **ea
 
 ```bash
 cv_project/
-├── config/
-│   ├── models_parameters.yaml       # Hyperparameters for each model
+├── config/                         
+│   ├── models_parameters.yaml       # Yaml containing best hyperparameters for each model
 │   └── config_loader.py             # Utility for loading configurations
-├── modules/
-│   ├── models/
-│   │   ├── create_desired_model.py  # Factory for model creation
-│   │   ├── CSRNET_model.py          # CSRNet implementation
-│   │   └── crowd_counting_models.py # ResNet50, VGG16, VGG19, Xception implementations
-│   ├── training_eval_pipeline/
-│   │   ├── training_functions.py    # Training and evaluation logic
-│   │   └── evaluation_functions.py  # Evaluation metrics and utilities
-└── README.md                        # Project documentation
+├── modules/                              
+│   ├── data_utils/                  
+│   │   ├── data_processor_class.py  # Data generator classes for CSRNet and other models
+│   │   ├── density_map_utils.py     # Functions for creating and processing density maps
+│   │   ├── load_and_preprocess_data.py # Functions to load the dataset and initialize generators
+│   │   ├── visualization.py         # Functions to create various plots
+│   ├── models/                      
+│   │   ├── create_desired_model.py  # Factory for creating desired models
+│   │   ├── crowd_counting_models.py # Implementations of ResNet, VGG, Xception, etc.
+│   │   ├── CSRNET_model.py          # CSRNet-specific implementation
+│   ├── training_eval_pipeline/      
+│   │   ├── training_functions.py    # Functions for training models
+│   │   ├── evaluation_functions.py  # Functions for evaluating models
+├── project_notebook.ipynb           # Jupyter Notebook used to run the code!
+├── paths.py                         # Python script containing data Paths
+├── requirements.txt                 # text file containing required packages for this project 
+├── README.md                        # Project documentation
+└── LICENSE         
 ``` 
 
 
