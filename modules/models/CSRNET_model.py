@@ -1,5 +1,4 @@
 from tensorflow.keras import layers, models, Input
-from tensorflow.keras.models import Model
 from tensorflow.keras.applications import VGG16
 from tensorflow.keras.initializers import RandomNormal
 
@@ -34,6 +33,6 @@ def create_CSRNET_model():
     output = layers.Conv2D(1, (1, 1), dilation_rate=1,
                            kernel_initializer=init, padding='same')(x)
 
-    model = models.Model(inputs=input_tensor, outputs=output)
+    model = models.Model(inputs=input_tensor, outputs=output,model_name='CSRNET')
 
     return model

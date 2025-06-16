@@ -1,4 +1,4 @@
-from modules.models.density_models import create_CSRNET_model, create_modified_CSRNet_model
+from modules.models.CSRNET_model import create_CSRNET_model
 from modules.models.crowd_counting_models import create_resnet50_model, create_vgg16_model, create_vgg19_model, create_xception_model
 
 def create_chosen_model(model_type: str):
@@ -12,8 +12,6 @@ def create_chosen_model(model_type: str):
         return create_vgg19_model()
     elif model_type == 'xception':
         return create_xception_model()
-    elif model_type == 'modified_csrnet':
-        return create_modified_CSRNet_model()
     elif model_type == 'csrnet':
         return create_CSRNET_model()
     else:

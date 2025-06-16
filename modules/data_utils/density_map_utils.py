@@ -39,10 +39,10 @@ def gaussian_filter_density(ground_truth, beta=0.1):
         density += gaussian_filter(point_2d, sigma, mode='constant')
     return density
 
-def scale_coordinates(head_positions, scale_x=1/16, scale_y=1/16):
+def scale_coordinates(head_positions, scale_x=0.5, scale_y=0.5):
     return [[x * scale_x, y * scale_y] for x, y in head_positions]
 
 def create_density_map(head_positions,beta=0.1):
     scaled_positions = scale_coordinates(head_positions)
-    ground_truth = create_ground_truth(scaled_positions, height=30, width=40)
+    ground_truth = create_ground_truth(scaled_positions, height=240, width=320)
     return gaussian_filter_density(ground_truth,beta=beta)

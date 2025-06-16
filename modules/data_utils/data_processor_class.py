@@ -123,10 +123,11 @@ class DataGenerator_Csrnet(Sequence):
             cache_key = row['image_name']
 
             if cache_key in self.cache:
-                image, density_map = self.cache[cache_key]
+                image, resized_density_map = self.cache[cache_key]
+                
             else:
                 image_annotations = row['annotations']
-                density_map = create_density_map(image_annotations,beta=0.1)  # Directly create density map
+                density_map = create_density_map(image_annotations,beta=0.1)  
                 density_map_target_size = (self.target_size[1] // 8, self.target_size[0] // 8)
                 resized_density_map = cv2.resize(
                     density_map,
@@ -148,13 +149,14 @@ class DataGenerator_Csrnet(Sequence):
                     image = self.resize_image(image)
                     image = self.preprocess_image(image)
 
-                    self.cache[cache_key] = (image, density_map)
+                    self.cache[cache_key] = (image, resized_density_map)
                 else:
                     print(f"Warning: Could not load image at {image_path}")
                     continue
 
-            X.append(image)
-            y.append(resized_density_map)
+            if image is not None and resized_density_map is not None:
+                X.append(image)
+                y.append(resized_density_map)
 
         return np.array(X), np.array(y, dtype=np.float32)
 

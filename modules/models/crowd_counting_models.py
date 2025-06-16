@@ -14,7 +14,7 @@ def create_resnet50_model():
     x = base_model.output  
     x = Dense(1024, activation='relu')(x)  
     predictions = Dense(1, activation='linear')(x)  
-    model = Model(inputs=base_model.input, outputs=predictions)
+    model = Model(inputs=base_model.input, outputs=predictions,model_name='ResNet50')
 
     k = -7
     for layer in model.layers[:k]:
@@ -35,7 +35,7 @@ def create_vgg16_model():
     x = base_model.output  
     x = Dense(1024, activation='relu')(x)  
     predictions = Dense(1, activation='linear')(x)  
-    model = Model(inputs=base_model.input, outputs=predictions)
+    model = Model(inputs=base_model.input, outputs=predictions,model_name='VGG16')
 
     k = -7
     for layer in model.layers[:k]:
@@ -56,7 +56,7 @@ def create_vgg19_model():
     x = base_model.output  
     x = Dense(1024, activation='relu')(x)  
     predictions = Dense(1, activation='linear')(x)  
-    model = Model(inputs=base_model.input, outputs=predictions)
+    model = Model(inputs=base_model.input, outputs=predictions,model_name='VGG19')
 
     k = -7
     for layer in model.layers[:k]:
@@ -79,6 +79,6 @@ def create_xception_model():
     x = base_model.output  
     x = Dense(1024, activation='relu')(x)  
     predictions = Dense(1, activation='linear')(x)  
-    model = Model(inputs=base_model.input, outputs=predictions)
+    model = Model(inputs=base_model.input, outputs=predictions,model_name='Xception')
 
     return model
