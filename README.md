@@ -43,10 +43,9 @@ cv_project/
 │   │   ├── training_functions.py    # Functions for training models
 │   │   ├── evaluation_functions.py  # Functions for evaluating models
 ├── project_notebook.ipynb           # Jupyter Notebook used to run the code!
+├── README.md                        # Project documentation
 ├── paths.py                         # Python script containing data Paths
 ├── requirements.txt                 # text file containing required packages for this project 
-├── README.md                        # Project documentation
-└── LICENSE         
 ``` 
 
 
