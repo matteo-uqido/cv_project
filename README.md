@@ -38,7 +38,8 @@ cv_project/
 │   │   ├── training_functions.py    # Training and evaluation logic
 │   │   └── evaluation_functions.py  # Evaluation metrics and utilities
 └── README.md                        # Project documentation
-'''
+``` 
+
 
 # Project documentation
 
@@ -69,3 +70,5 @@ resnet50:
     es_patience: 5
     monitor: val_mse
     es_min_delta: 0.001
+```
+
