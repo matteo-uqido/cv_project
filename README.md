@@ -55,12 +55,8 @@ cv_project/
 
 ## Getting Started
 
-### Prerequisites
-
-- Python 3.8+
-- TensorFlow 2.x
-- Keras
-- PyYAML
+You can either run the contents of the project_notebook in a Colab environment or you can clone this repository into your local machine.
+If you choose the latter be sure to install the required libraries which can be found in requirements.txt
 
 ---
 
